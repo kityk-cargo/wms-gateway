@@ -1,0 +1,45 @@
+Thank you for installing {{ .Chart.Name }}.
+
+{{- if not (lookup "apiextensions.k8s.io/v1" "CustomResourceDefinition" "" "apisixroutes.apisix.apache.org") }}
+IMPORTANT: APISIX CRDs are not installed in your cluster.
+
+The API routes will NOT be created until you install the CRDs.
+Please install the official APISIX chart first which will create all required CRDs:
+
+helm upgrade --install apisix apisix/apisix \
+  --set ingress-controller.enabled=true \
+  --set etcd.enabled=true \
+  --set ingress-controller.config.apisix.adminKey=YOUR_KEY
+
+After installing APISIX and confirming CRDs are available, upgrade this release:
+
+helm upgrade {{ .Release.Name }} ./wms-gateway/helm -f ./wms-gateway/helm/values-local.yaml
+
+{{- else }}
+API routes have been successfully deployed.
+
+To access the gateway:
+{{- if eq .Values.apisix.gateway.type "NodePort" }}
+  http://localhost:{{ .Values.apisix.gateway.http.nodePort }}
+{{- else }}
+  You'll need to configure proper ingress or port forwarding to access the gateway.
+{{- end }}
+
+Exposed services:
+- Order service: {{ .Values.wmsRoutes.orderService.host }}/orders
+- Inventory service: {{ .Values.wmsRoutes.inventoryService.host }}/api/v1/products
+
+Rate limiting is set to {{ .Values.apisix.config.apisix.rateLimit.requestsPerSecond }} requests per second.
+
+HTTP method restrictions are in place according to the values defined in your configuration.
+{{- end }}
+
+To check if the installation is complete, run:
+  kubectl get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+
+For verification, check that the CRDs are installed and the routes are created:
+  kubectl get crds | grep apisix
+  kubectl get apisixroutes
+
+For troubleshooting route issues:
+  kubectl describe apisixroutes {{ .Release.Name }}-wms-gateway-order-service 

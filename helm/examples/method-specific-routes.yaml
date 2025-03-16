@@ -1,0 +1,71 @@
+# Example of how to create method-specific routes
+# Use this as a reference when you need different method restrictions for different paths
+
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: user-service-get-routes
+  labels:
+    app: user-service
+spec:
+  http:
+    - name: user-get-routes
+      match:
+        hosts:
+          - api.example.com
+        paths:
+          - "/api/v1/users"
+          - "/api/v1/users/*"
+        methods:
+          - GET
+      backends:
+        - serviceName: user-service-read
+          servicePort: 8080
+
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: user-service-write-routes
+  labels:
+    app: user-service
+spec:
+  http:
+    - name: user-create-routes
+      match:
+        hosts:
+          - api.example.com
+        paths:
+          - "/api/v1/users"
+        methods:
+          - POST
+      backends:
+        - serviceName: user-service-write
+          servicePort: 8080
+
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: user-service-update-delete-routes
+  labels:
+    app: user-service
+spec:
+  http:
+    - name: user-update-delete-routes
+      match:
+        hosts:
+          - api.example.com
+        paths:
+          - "/api/v1/users/*"
+        methods:
+          - PUT
+          - DELETE
+      backends:
+        - serviceName: user-service-write
+          servicePort: 8080
+
+# Note: This approach creates 3 separate routes with different method restrictions
+# - The first route allows GET for both /users and /users/*
+# - The second route allows POST only for /users
+# - The third route allows PUT and DELETE only for /users/* 

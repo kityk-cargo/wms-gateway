@@ -1,0 +1,82 @@
+global:
+  namespace: default
+
+# Default values for WMS Gateway Helm chart
+# This is a YAML-formatted file.
+
+# Note: This chart requires APISIX CRDs to be installed in your cluster.
+# Please follow the two-step installation process described in the README.md file:
+# 1. First install the official APISIX chart with CRDs
+# 2. Then install this chart
+
+apisix:
+  enabled: true
+  image:
+    repository: apache/apisix
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1
+    
+  # Common APISIX configuration
+  admin:
+    enabled: true
+    port: 9180
+    servicePort: 9180
+    credentials:
+      admin: admin
+      viewer: viewer
+
+  # Custom APISIX configuration
+  customPlugins:
+    enabled: false
+
+  # APISIX configuration
+  config:
+    apisix:
+      # Rate limit settings will be overridden in environment-specific files
+      rateLimit:
+        requestsPerSecond: 100  # Default rate limit
+      
+# WMS Routes Configuration - common for all environments
+wmsRoutes:
+  # Order Service Routes
+  orderService:
+    enabled: true
+    # Host and port will be overridden in environment-specific values
+    servicePort: 8080
+    paths:
+      - path: "/orders"
+        methods: ["GET", "POST", "PUT", "DELETE"]
+      - path: "/orders/*"
+        methods: ["GET", "PUT", "DELETE"]
+    excludePaths:
+      - "/health"
+      - "/health/liveness"
+      - "/health/readiness"
+  
+  # Inventory Service Routes
+  inventoryService:
+    enabled: true
+    # Host and port will be overridden in environment-specific values
+    servicePort: 8080
+    paths:
+      - path: "/api/v1/products"
+        methods: ["GET", "POST", "PUT", "DELETE"]
+      - path: "/api/v1/products/*"
+        methods: ["GET", "PUT", "DELETE"]
+      - path: "/api/v1/stock"
+        methods: ["GET", "POST", "PUT", "DELETE"]
+      - path: "/api/v1/stock/inbound"
+        methods: ["POST"]
+      - path: "/api/v1/stock/outbound"
+        methods: ["POST"]
+      - path: "/api/v1/locations"
+        methods: ["GET", "POST", "PUT", "DELETE"]
+      - path: "/api/v1/locations/*"
+        methods: ["GET", "PUT", "DELETE"]
+    excludePaths:
+      - "/health"
+      - "/health/liveness"
+      - "/health/readiness"
+      - "/health/startup" 

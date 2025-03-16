@@ -1,0 +1,89 @@
+{{- if lookup "apiextensions.k8s.io/v1" "CustomResourceDefinition" "" "apisixroutes.apisix.apache.org" }}
+{{- if .Values.wmsRoutes.orderService.enabled }}
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: {{ include "wms-gateway.fullname" . }}-order-service
+  labels:
+    {{- include "wms-gateway.labels" . | nindent 4 }}
+spec:
+  http:
+    - name: order-service-route
+      match:
+        hosts:
+          - {{ .Values.wmsRoutes.orderService.host }}
+        paths:
+        {{- range .Values.wmsRoutes.orderService.paths }}
+          - {{ .path }}
+        {{- end }}
+        methods:
+        {{- $uniqueMethods := list }}
+        {{- range .Values.wmsRoutes.orderService.paths }}
+          {{- range .methods }}
+            {{- if not (has . $uniqueMethods) }}
+              {{- $uniqueMethods = append $uniqueMethods . }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- range $uniqueMethods }}
+          - {{ . }}
+        {{- end }}
+      backends:
+        - serviceName: {{ .Values.wmsRoutes.orderService.serviceName }}
+          servicePort: {{ .Values.wmsRoutes.orderService.servicePort }}
+      plugins:
+        - name: limit-req
+          enable: true
+          config:
+            rate: {{ .Values.apisix.config.apisix.rateLimit.requestsPerSecond }}
+            burst: {{ mul .Values.apisix.config.apisix.rateLimit.requestsPerSecond 2 }}
+            key: remote_addr
+            rejected_code: 429
+            allow_degradation: false
+{{- end }}
+
+{{- if .Values.wmsRoutes.inventoryService.enabled }}
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: {{ include "wms-gateway.fullname" . }}-inventory-service
+  labels:
+    {{- include "wms-gateway.labels" . | nindent 4 }}
+spec:
+  http:
+    - name: inventory-service-route
+      match:
+        hosts:
+          - {{ .Values.wmsRoutes.inventoryService.host }}
+        paths:
+        {{- range .Values.wmsRoutes.inventoryService.paths }}
+          - {{ .path }}
+        {{- end }}
+        methods:
+        {{- $uniqueMethods := list }}
+        {{- range .Values.wmsRoutes.inventoryService.paths }}
+          {{- range .methods }}
+            {{- if not (has . $uniqueMethods) }}
+              {{- $uniqueMethods = append $uniqueMethods . }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- range $uniqueMethods }}
+          - {{ . }}
+        {{- end }}
+      backends:
+        - serviceName: {{ .Values.wmsRoutes.inventoryService.serviceName }}
+          servicePort: {{ .Values.wmsRoutes.inventoryService.servicePort }}
+      plugins:
+        - name: limit-req
+          enable: true
+          config:
+            rate: {{ .Values.apisix.config.apisix.rateLimit.requestsPerSecond }}
+            burst: {{ mul .Values.apisix.config.apisix.rateLimit.requestsPerSecond 2 }}
+            key: remote_addr
+            rejected_code: 429
+            allow_degradation: false
+{{- end }}
+{{- end }} 

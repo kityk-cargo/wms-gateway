@@ -1,0 +1,65 @@
+{{- if lookup "apiextensions.k8s.io/v1" "CustomResourceDefinition" "" "apisixroutes.apisix.apache.org" }}
+{{- if .Values.wmsRoutes.orderService.enabled }}
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: {{ include "wms-gateway.fullname" . }}-order-service-health-exclusion
+  labels:
+    {{- include "wms-gateway.labels" . | nindent 4 }}
+spec:
+  http:
+    - name: order-service-health-exclusion
+      match:
+        hosts:
+          - {{ .Values.wmsRoutes.orderService.host }}
+        paths:
+        {{- range .Values.wmsRoutes.orderService.excludePaths }}
+          - {{ . }}
+        {{- end }}
+        methods:
+          - GET
+          - HEAD
+      backends:
+        - serviceName: {{ .Values.wmsRoutes.orderService.serviceName }}
+          servicePort: {{ .Values.wmsRoutes.orderService.servicePort }}
+      plugins:
+        - name: response-rewrite
+          enable: true
+          config:
+            status_code: 404
+            body: "Endpoint not exposed through API Gateway"
+{{- end }}
+
+{{- if .Values.wmsRoutes.inventoryService.enabled }}
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: {{ include "wms-gateway.fullname" . }}-inventory-service-health-exclusion
+  labels:
+    {{- include "wms-gateway.labels" . | nindent 4 }}
+spec:
+  http:
+    - name: inventory-service-health-exclusion
+      match:
+        hosts:
+          - {{ .Values.wmsRoutes.inventoryService.host }}
+        paths:
+        {{- range .Values.wmsRoutes.inventoryService.excludePaths }}
+          - {{ . }}
+        {{- end }}
+        methods:
+          - GET
+          - HEAD
+      backends:
+        - serviceName: {{ .Values.wmsRoutes.inventoryService.serviceName }}
+          servicePort: {{ .Values.wmsRoutes.inventoryService.servicePort }}
+      plugins:
+        - name: response-rewrite
+          enable: true
+          config:
+            status_code: 404
+            body: "Endpoint not exposed through API Gateway"
+{{- end }}
+{{- end }} 

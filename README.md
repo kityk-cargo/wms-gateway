@@ -5,6 +5,25 @@ WMS API gateway
 
 This project uses Apache APISIX as the API gateway to expose and manage APIs from various WMS microservices.
 
+## Installation
+
+This project is deployed as a Helm chart. For detailed installation instructions, see the [helm chart README](./helm/README.md).
+
+The installation process uses a two-step approach:
+1. First install the official APISIX Helm chart which provides CRDs
+2. Then install the WMS Gateway Helm chart
+
+```bash
+# Step 1: Install APISIX with CRDs
+helm upgrade --install apisix apisix/apisix \
+  --set ingress-controller.enabled=true \
+  --set etcd.enabled=true \
+  --set ingress-controller.config.apisix.adminKey=YOUR_KEY
+
+# Step 2: Install WMS Gateway
+helm install wms-gateway ./wms-gateway/helm -f ./wms-gateway/helm/values-local.yaml
+```
+
 ### Available Routes
 
 #### Order Management Service
@@ -45,9 +64,16 @@ The Order Management API has a rate limit of 100 requests per second.
 
 ### Configuration
 
-The APISIX configuration is located in `config/apisix.yaml`. To modify the configuration:
+The APISIX configuration is located in the Helm chart values files. To modify the configuration:
 
-1. Edit the configuration file
-2. Restart the gateway service to apply changes
+1. Edit the appropriate values file:
+   - `helm/values.yaml`: Common settings
+   - `helm/values-local.yaml`: Local development settings
+   - `helm/values-prod.yaml`: Production settings
+
+2. Upgrade the helm release:
+   ```bash
+   helm upgrade wms-gateway ./wms-gateway/helm -f ./wms-gateway/helm/values-local.yaml
+   ```
 
 For more information about Apache APISIX configuration options, visit [APISIX Documentation](https://apisix.apache.org/docs/apisix/getting-started/).

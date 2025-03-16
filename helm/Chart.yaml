@@ -1,0 +1,9 @@
+apiVersion: v2
+name: wms-gateway
+version: 0.1.0
+description: A Helm chart for deploying APISIX as an API gateway for WMS services
+dependencies:
+  - name: apisix
+    version: "1.3.0"
+    repository: "https://charts.apiseven.com"
+    condition: apisix.enabled 

@@ -1,0 +1,36 @@
+# Production-specific overrides
+
+apisix:
+  # Production gateway configuration
+  gateway:
+    type: ClusterIP
+    http:
+      enabled: true
+      port: 80
+      nodePort: null
+    tls:
+      enabled: false
+      port: 443
+      nodePort: null
+  
+  # Admin API configuration for production
+  admin:
+    type: ClusterIP
+  
+  # Production rate limit settings
+  config:
+    apisix:
+      rateLimit:
+        requestsPerSecond: 100
+
+# Production service configurations
+wmsRoutes:
+  # Order Service production settings
+  orderService:
+    host: "order-api.wms.local"
+    serviceName: "wms-main-order-service"
+  
+  # Inventory Service production settings
+  inventoryService:
+    host: "inventory-api.wms.local"
+    serviceName: "wms-main-inventory-service" 

@@ -8,6 +8,7 @@ metadata:
   labels:
     {{- include "wms-gateway.labels" . | nindent 4 }}
 spec:
+  ingressClassName: "apisix"
   http:
     - name: order-service-route
       match:
@@ -52,6 +53,7 @@ metadata:
   labels:
     {{- include "wms-gateway.labels" . | nindent 4 }}
 spec:
+  ingressClassName: "apisix"
   http:
     - name: inventory-service-route
       match:
@@ -77,6 +79,10 @@ spec:
         - serviceName: {{ .Values.wmsRoutes.inventoryService.serviceName }}
           servicePort: {{ .Values.wmsRoutes.inventoryService.servicePort }}
       plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            keep_origin_uri: true
         - name: limit-req
           enable: true
           config:

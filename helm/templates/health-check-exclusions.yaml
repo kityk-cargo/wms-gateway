@@ -4,7 +4,7 @@
 apiVersion: apisix.apache.org/v2
 kind: ApisixRoute
 metadata:
-  name: {{ include "wms-gateway.fullname" . }}-order-service-health-exclusion
+  name: {{ .Release.Name }}-order-health-exclude
   labels:
     {{- include "wms-gateway.labels" . | nindent 4 }}
 spec:
@@ -36,7 +36,7 @@ spec:
 apiVersion: apisix.apache.org/v2
 kind: ApisixRoute
 metadata:
-  name: {{ include "wms-gateway.fullname" . }}-inventory-service-health-exclusion
+  name: {{ .Release.Name }}-inventory-health-exclude
   labels:
     {{- include "wms-gateway.labels" . | nindent 4 }}
 spec:

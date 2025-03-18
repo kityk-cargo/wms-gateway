@@ -19,8 +19,8 @@ helm upgrade {{ .Release.Name }} ./wms-gateway/helm -f ./wms-gateway/helm/values
 API routes have been successfully deployed.
 
 To access the gateway:
-{{- if eq .Values.apisix.gateway.type "NodePort" }}
-  http://localhost:{{ .Values.apisix.gateway.http.nodePort }}
+{{- if eq .Values.apisix.service.type "NodePort" }}
+  http://localhost:{{ .Values.apisix.service.http.nodePort }}
 {{- else }}
   You'll need to configure proper ingress or port forwarding to access the gateway.
 {{- end }}

@@ -1,19 +1,26 @@
 # Local development specific overrides
 
 apisix:
+  apisix:  # Admin API configuration for local development
+    admin:
+      type: NodePort
+      nodePort: 30180
+      # Allow access from any IP address for local development
+      allow:
+        ipList:
+          - "0.0.0.0/0"
+      credentials:
+        admin: admin
+        viewer: viewer
+
+  
   # NodePort configuration for local development
-  gateway:
+  service:
     type: NodePort
     http:
       enabled: true
-      port: 80
       nodePort: 30080
-  
-  # Admin API configuration for local development
-  admin:
-    type: NodePort
-    nodePort: 30180
-  
+
   # More permissive rate limit for local development
   config:
     apisix:
@@ -24,10 +31,12 @@ apisix:
 wmsRoutes:
   # Order Service local settings
   orderService:
+    enabled: true
     host: "localhost"
     serviceName: "wms-main-order-service"
   
   # Inventory Service local settings
   inventoryService:
+    enabled: true
     host: "localhost"
     serviceName: "wms-main-inventory-service" 

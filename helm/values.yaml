@@ -19,7 +19,7 @@ apisix:
   replicaCount: 1
     
   # Common APISIX configuration
-  admin:
+  service:
     enabled: true
     port: 9180
     servicePort: 9180
@@ -30,6 +30,8 @@ apisix:
   # Custom APISIX configuration
   customPlugins:
     enabled: false
+    luaPath: "/apisix/plugins"
+    plugins: []
 
   # APISIX configuration
   config:
@@ -37,7 +39,23 @@ apisix:
       # Rate limit settings will be overridden in environment-specific files
       rateLimit:
         requestsPerSecond: 100  # Default rate limit
-      
+  
+  # Enable the APISIX ingress controller to handle CRDs
+  ingress-controller:
+    enabled: true
+    config:
+      kubernetes:
+        # Make sure the ingress controller watches for resources with ingressClass "apisix"
+        ingress_class: "apisix"
+      apisix:
+        serviceNamespace: default
+        adminKey: admin
+        adminAPIVersion: v3
+        # Point to the correct admin service name
+        serviceName: wms-gateway-apisix-admin
+      # Disable SSL checking
+      enable_ssl: false
+
 # WMS Routes Configuration - common for all environments
 wmsRoutes:
   # Order Service Routes
@@ -59,7 +77,7 @@ wmsRoutes:
   inventoryService:
     enabled: true
     # Host and port will be overridden in environment-specific values
-    servicePort: 8080
+    servicePort: 8000
     paths:
       - path: "/api/v1/products"
         methods: ["GET", "POST", "PUT", "DELETE"]

@@ -64,15 +64,15 @@ wmsRoutes:
     # Host and port will be overridden in environment-specific values
     servicePort: 8080
     paths:
-      - path: "/orders"
+      - path: "/api/v1/orders"
         methods: ["GET", "POST", "PUT", "DELETE"]
-      - path: "/orders/*"
+      - path: "/api/v1/orders/*"
         methods: ["GET", "PUT", "DELETE"]
     excludePaths:
       - "/health"
       - "/health/liveness"
       - "/health/readiness"
-  
+      - "/health/startup"
   # Inventory Service Routes
   inventoryService:
     enabled: true
@@ -97,4 +97,14 @@ wmsRoutes:
       - "/health"
       - "/health/liveness"
       - "/health/readiness"
-      - "/health/startup" 
+      - "/health/startup"
+
+  # UI Service Routes
+  uiService:
+    enabled: true
+    servicePort: 80
+    paths:
+      - path: "/ui"
+        methods: ["GET"]
+      - path: "/ui/*"
+        methods: ["GET"] 

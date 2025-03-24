@@ -92,4 +92,34 @@ spec:
             rejected_code: 429
             allow_degradation: false
 {{- end }}
+
+{{- if .Values.wmsRoutes.uiService.enabled }}
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: {{ include "wms-gateway.fullname" . }}-ui-service
+  labels:
+    {{- include "wms-gateway.labels" . | nindent 4 }}
+spec:
+  ingressClassName: "apisix"
+  http:
+    - name: ui-service-route
+      match:
+        hosts:
+          - {{ .Values.wmsRoutes.uiService.host }}
+        paths:
+          - /ui
+          - /ui/*
+        methods:
+          - GET
+      backends:
+        - serviceName: {{ .Values.wmsRoutes.uiService.serviceName }}
+          servicePort: {{ .Values.wmsRoutes.uiService.servicePort }}
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            uri_prefix: "/ui"
+{{- end }}
 {{- end }} 

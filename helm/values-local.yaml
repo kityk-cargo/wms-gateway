@@ -39,4 +39,10 @@ wmsRoutes:
   inventoryService:
     enabled: true
     host: "localhost"
-    serviceName: "wms-main-inventory-service" 
+    serviceName: "wms-main-inventory-service"
+    
+  # UI Service local settings
+  uiService:
+    enabled: true
+    host: "localhost"
+    serviceName: "wms-main-ui-service" 

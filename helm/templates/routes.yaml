@@ -120,6 +120,6 @@ spec:
         - name: proxy-rewrite
           enable: true
           config:
-            uri_prefix: "/ui"
+            keep_origin_uri: true
 {{- end }}
 {{- end }} 

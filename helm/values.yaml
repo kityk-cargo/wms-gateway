@@ -47,6 +47,7 @@ apisix:
       kubernetes:
         # Make sure the ingress controller watches for resources with ingressClass "apisix"
         ingress_class: "apisix"
+        watch_endpoint_slices: true
       apisix:
         serviceNamespace: default
         adminKey: admin
